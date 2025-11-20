@@ -1,75 +1,58 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { Cardapio, Pratos } from '../Home';
+
 import CardPerfil from '../../Components/CardPerfil';
 import HeaderPerfil from '../../Components/HeaderPerfil';
 import { Cards, Principal } from '../../styles';
-import { PratoPerfil } from '../../models/prato';
-import pizza from '../../assets/images/pizza.png';
-
-const PratosPerfil: PratoPerfil[] = [
-     {
-          id: 1,
-          imagem: pizza,
-          titulo: 'Pizza Marguerita',
-          descricao: `A clássica Marguerita: molho de tomate suculento,
-               mussarela derretida, manjericão fresco e um toque de azeite.
-               Sabor e simplicidade!`,
-     },
-     {
-          id: 2,
-          imagem: pizza,
-          titulo: 'Pizza Marguerita',
-          descricao: `A clássica Marguerita: molho de tomate suculento,
-               mussarela derretida, manjericão fresco e um toque de azeite.
-               Sabor e simplicidade!`,
-     },
-     {
-          id: 3,
-          imagem: pizza,
-          titulo: 'Pizza Marguerita',
-          descricao: `A clássica Marguerita: molho de tomate suculento,
-               mussarela derretida, manjericão fresco e um toque de azeite.
-               Sabor e simplicidade!`,
-     },
-     {
-          id: 4,
-          imagem: pizza,
-          titulo: 'Pizza Marguerita',
-          descricao: `A clássica Marguerita: molho de tomate suculento,
-               mussarela derretida, manjericão fresco e um toque de azeite.
-               Sabor e simplicidade!`,
-     },
-     {
-          id: 5,
-          imagem: pizza,
-          titulo: 'Pizza Marguerita',
-          descricao: `A clássica Marguerita: molho de tomate suculento,
-               mussarela derretida, manjericão fresco e um toque de azeite.
-               Sabor e simplicidade!`,
-     },
-     {
-          id: 6,
-          imagem: pizza,
-          titulo: 'Pizza Marguerita',
-          descricao: `A clássica Marguerita: molho de tomate suculento,
-               mussarela derretida, manjericão fresco e um toque de azeite.
-               Sabor e simplicidade!`,
-     },
-];
+import Modal from '../../Components/Modal';
 
 const Perfil = () => {
+     const [pratosPerfil, setPratosPerfil] = useState<Cardapio[]>([]);
+     const [pratos, setPratos] = useState<Pratos | null>(null);
+
+     const [modalAberto, setModalAberto] = useState(false);
+     const [pratoSelecionado, setPratoSelecionado] = useState<Cardapio | null>(null);
+
+     const { id } = useParams();
+
+     useEffect(() => {
+          fetch(`https://api-ebac.vercel.app/api/efood/restaurantes/${id}`)
+               .then(res => res.json())
+               .then((res: Pratos) => {
+                    setPratosPerfil(res.cardapio);
+                    setPratos(res);
+               });
+     }, [id]);
+
+     if (!pratos) {
+          return <h1>Carregando...</h1>;
+     }
+
      return (
           <>
-               <HeaderPerfil />
+               {pratos && (
+                    <HeaderPerfil capa={pratos.capa} nome={pratos.titulo} tipo={pratos.tipo} />
+               )}
                <Principal>
                     <Cards tipoCards="perfil">
-                         {PratosPerfil.map(prato => (
+                         {pratosPerfil.map(prato => (
                               <CardPerfil
                                    key={prato.id}
-                                   imagem={prato.imagem}
-                                   titulo={prato.titulo}
+                                   imagem={prato.foto}
+                                   titulo={prato.nome}
                                    descricao={prato.descricao}
+                                   onMaisDetalhes={() => {
+                                        setPratoSelecionado(prato);
+                                        setModalAberto(true);
+                                   }}
                               />
                          ))}
                     </Cards>
+                    {modalAberto && pratoSelecionado && (
+                         <Modal prato={pratoSelecionado} onFechar={() => setModalAberto(false)} />
+                    )}
                </Principal>
           </>
      );

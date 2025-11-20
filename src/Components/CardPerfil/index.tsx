@@ -4,18 +4,26 @@ type Props = {
      imagem: string;
      titulo: string;
      descricao: string;
+     onMaisDetalhes?: () => void;
 };
 
-const CardPerfil = ({ imagem, titulo, descricao }: Props) => {
+const CardPerfil = ({ imagem, titulo, descricao, onMaisDetalhes }: Props) => {
+     const getDescricao = (descricao: string) => {
+          if (descricao.length > 132) {
+               return descricao.substring(0, 129) + '...';
+          }
+          return descricao;
+     };
+
      return (
           <Container>
                <img src={imagem} alt="" />
 
                <Titulo>{titulo}</Titulo>
 
-               <Descricao>{descricao}</Descricao>
+               <Descricao>{getDescricao(descricao)}</Descricao>
 
-               <Botao>Adicionar ao carrinho</Botao>
+               <Botao onClick={onMaisDetalhes}>Mais detalhes</Botao>
           </Container>
      );
 };
