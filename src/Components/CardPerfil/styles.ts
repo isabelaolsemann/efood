@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Cores } from '../../styles';
+import { Colors } from '../../styles';
 
 export const Container = styled.div`
      max-width: 320px;
@@ -9,7 +9,7 @@ export const Container = styled.div`
      flex-direction: column;
      align-items: flex-start;
      justify-content: space-between;
-     background-color: ${Cores.salmao};
+     background-color: ${Colors.salmon};
      padding: 10px;
 
      img {
@@ -20,24 +20,24 @@ export const Container = styled.div`
      }
 `;
 
-export const Titulo = styled.h1`
+export const Title = styled.h1`
      font-family: 'Roboto';
      font-weight: 900;
      font-size: 16px;
-     color: ${Cores.bege};
+     color: ${Colors.beige};
 `;
 
-export const Descricao = styled.p`
+export const Description = styled.p`
      font-family: 'Roboto';
      font-weight: 400;
      font-size: 14px;
      line-height: 22px;
-     color: ${Cores.bege};
+     color: ${Colors.beige};
 `;
 
-export const Botao = styled.button`
-     background-color: ${Cores.bege};
-     color: ${Cores.salmao};
+export const Button = styled.button`
+     background-color: ${Colors.beige};
+     color: ${Colors.salmon};
      font-size: 14px;
      font-weight: 700;
      padding: 4px 10px;

@@ -1,63 +1,77 @@
-import pizza from '../../assets/images/pizza.png';
 import fechar from '../../assets/images/close 1.png';
-import {
-     Container,
-     Descricao,
-     Modal as ModalStyled,
-     Titulo,
-     Botao,
-     ImgFechar,
-     Overlay,
-} from './styles';
+import * as S from './styles';
 import { useDispatch } from 'react-redux';
-
-import { add, open } from '../../store/reducers/cart';
-import { Cardapio } from '../../pages/Home';
+import { AnimatePresence, motion } from 'framer-motion';
+import { add, openCart } from '../../store/reducers/cart';
+import { useState } from 'react';
 
 type Props = {
-     prato: Cardapio;
-     onFechar: () => void;
+     dish: Cardapio;
+     onClose: () => void;
 };
 
-const Modal = ({ prato, onFechar }: Props) => {
+const Modal = ({ dish, onClose }: Props) => {
      const dispatch = useDispatch();
+     const [isVisible, setIsVisible] = useState(true);
 
-     const addPrato = () => {
-          dispatch(add(prato));
-          onFechar();
-          dispatch(open());
+     const closeModal = () => {
+          setIsVisible(false);
      };
 
-     const formatarPreco = (preco: number) => {
-          if (preco !== undefined && preco !== null) {
-               return preco.toFixed(2).replace('.', ',');
+     const handleExited = () => {
+          onClose();
+     };
+
+     const addDish = () => {
+          dispatch(add(dish));
+          closeModal();
+          dispatch(openCart());
+     };
+
+     const formatPrice = (price: number) => {
+          if (price !== undefined && price !== null) {
+               return price.toFixed(2).replace('.', ',');
           }
           return '0,00';
      };
 
      return (
-          <Container>
-               <Overlay onClick={onFechar} />
-               <ModalStyled>
-                    <div>
-                         <img src={prato.foto} alt="" />
-                    </div>
+          <AnimatePresence onExitComplete={handleExited}>
+               {isVisible && (
+                    <S.Container>
+                         <motion.div
+                              className="overlay"
+                              onClick={closeModal}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 0.5 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                         />
 
-                    <div>
-                         <Titulo>{prato.nome}</Titulo>
+                         <motion.div
+                              className="modal"
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.8 }}
+                              transition={{ duration: 0.3 }}
+                         >
+                              <img className="dish-image" src={dish.foto} alt={dish.nome} />
 
-                         <Descricao>{prato.descricao}</Descricao>
+                              <div className="content">
+                                   <S.Title>{dish.nome}</S.Title>
+                                   <S.Description>{dish.descricao}</S.Description>
+                                   <span>Serve de: {dish.porcao}</span>
 
-                         <span>Serve de: {prato.porcao}</span>
+                                   <S.Button onClick={addDish}>
+                                        Adicionar ao carrinho - R$ {formatPrice(dish.preco || 0)}
+                                   </S.Button>
+                              </div>
 
-                         <Botao onClick={addPrato}>
-                              Adicionar ao carrinho - R$ {formatarPreco(prato.preco || 0)}
-                         </Botao>
-                    </div>
-
-                    <ImgFechar src={fechar} alt="Fechar" onClick={onFechar} />
-               </ModalStyled>
-          </Container>
+                              <S.ImageClose src={fechar} alt="Fechar" onClick={closeModal} />
+                         </motion.div>
+                    </S.Container>
+               )}
+          </AnimatePresence>
      );
 };
 

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Cardapio, Pratos } from '../Home';
-
 import CardPerfil from '../../Components/CardPerfil';
 import HeaderPerfil from '../../Components/HeaderPerfil';
-import { Cards, Principal } from '../../styles';
+import { Cards, Main } from '../../styles';
 import Modal from '../../Components/Modal';
+import Payment from '../../Components/Payment';
+import { useSelector } from 'react-redux';
+import { RootReducer } from '../../store';
+import Loader from '../../Components/Loader';
 
 const Perfil = () => {
      const [pratosPerfil, setPratosPerfil] = useState<Cardapio[]>([]);
@@ -14,6 +16,8 @@ const Perfil = () => {
 
      const [modalAberto, setModalAberto] = useState(false);
      const [pratoSelecionado, setPratoSelecionado] = useState<Cardapio | null>(null);
+
+     const { isOpenPayment } = useSelector((state: RootReducer) => state.payment);
 
      const { id } = useParams();
 
@@ -27,15 +31,15 @@ const Perfil = () => {
      }, [id]);
 
      if (!pratos) {
-          return <h1>Carregando...</h1>;
+          return <Loader />;
      }
 
      return (
           <>
                {pratos && (
-                    <HeaderPerfil capa={pratos.capa} nome={pratos.titulo} tipo={pratos.tipo} />
+                    <HeaderPerfil cover={pratos.capa} name={pratos.titulo} type={pratos.tipo} />
                )}
-               <Principal>
+               <Main>
                     <Cards tipoCards="perfil">
                          {pratosPerfil.map(prato => (
                               <CardPerfil
@@ -51,9 +55,11 @@ const Perfil = () => {
                          ))}
                     </Cards>
                     {modalAberto && pratoSelecionado && (
-                         <Modal prato={pratoSelecionado} onFechar={() => setModalAberto(false)} />
+                         <Modal dish={pratoSelecionado} onClose={() => setModalAberto(false)} />
                     )}
-               </Principal>
+               </Main>
+
+               <Payment active={isOpenPayment} />
           </>
      );
 };

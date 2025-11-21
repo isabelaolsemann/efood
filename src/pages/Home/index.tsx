@@ -1,28 +1,8 @@
 import Card from '../../Components/Card';
-import { Cards, Principal } from '../../styles';
+import { Cards, Main } from '../../styles';
 import Hero from '../../containers/Hero';
-import { useEffect, useState } from 'react';
 import { useGetRestaurantsQuery } from '../../services/api';
-
-export type Pratos = {
-     id: number;
-     titulo: string;
-     destacado: boolean;
-     tipo: string;
-     avaliacao: number;
-     descricao: string;
-     capa: string;
-     cardapio: Cardapio[];
-};
-
-export type Cardapio = {
-     foto: string;
-     preco: number;
-     id: number;
-     nome: string;
-     descricao: string;
-     porcao: string;
-};
+import Loader from '../../Components/Loader';
 
 const Home = () => {
      const { data: cardapio } = useGetRestaurantsQuery();
@@ -31,7 +11,7 @@ const Home = () => {
           return (
                <>
                     <Hero />
-                    <Principal>
+                    <Main>
                          <Cards tipoCards="principal">
                               {cardapio.map(prato => (
                                    <Card
@@ -46,11 +26,11 @@ const Home = () => {
                                    />
                               ))}
                          </Cards>
-                    </Principal>
+                    </Main>
                </>
           );
      } else {
-          return <h1>Carregando...</h1>;
+          return <Loader />;
      }
 };
 

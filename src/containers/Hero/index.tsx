@@ -1,15 +1,18 @@
-import { Container, Logo as LogoStyled, Titulo } from './styles';
+import * as S from './styles';
 import logo from '../../assets/images/logo.png';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
      return (
-          <Container>
-               <LogoStyled>
-                    <img src={logo} alt="Logo efood" />
-               </LogoStyled>
+          <S.Container>
+               <S.Logo>
+                    <Link to="/">
+                         <img src={logo} alt="Logo efood" />
+                    </Link>
+               </S.Logo>
 
-               <Titulo>Viva experiências gastronômicas no conforto da sua casa</Titulo>
-          </Container>
+               <S.Title>Viva experiências gastronômicas no conforto da sua casa</S.Title>
+          </S.Container>
      );
 };
 

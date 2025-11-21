@@ -1,54 +1,68 @@
-import { Button, Container, Lixeira, NomePrato, Overlay, Prato, Sidebar, Valor } from './styles';
-import pizza from '../../assets/images/pizza.png';
+import * as S from './styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { close, remove } from '../../store/reducers/cart';
+import { closeCart, remove } from '../../store/reducers/cart';
+import { openPayment } from '../../store/reducers/payment';
 import { RootReducer } from '../../store';
+import { formatPrice } from '../../utils';
+import { getTotalPrice } from '../../utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const Cart = () => {
-     const { isOpen, items } = useSelector((state: RootReducer) => state.cart);
+     const { isOpenCart, items } = useSelector((state: RootReducer) => state.cart);
      const dispatch = useDispatch();
 
      const fecharCart = () => {
-          dispatch(close());
+          dispatch(closeCart());
      };
 
      const removerPrato = (id: number) => {
           dispatch(remove(id));
      };
 
-     const formatarPreco = (preco: number) => {
-          if (preco !== undefined && preco !== null) {
-               return 'R$ ' + preco.toFixed(2).replace('.', ',');
+     const payment = () => {
+          if (items.length > 0) {
+               dispatch(closeCart());
+               dispatch(openPayment());
+          } else {
+               toast.error('Seu carrinho está vazio!');
           }
-          return '0,00';
      };
 
-     const totalCart = items.reduce((total, item) => total + item.preco, 0);
-
      return (
-          <Container className={isOpen ? 'is-open' : ''}>
-               <Overlay onClick={fecharCart} />
+          <S.Container className={isOpenCart ? 'is-open' : ''}>
+               <S.Overlay onClick={fecharCart} />
 
-               <Sidebar>
-                    {items.map(item => (
-                         <Prato>
-                              <img src={item.foto} alt="Prato" />
-                              <div>
-                                   <NomePrato>{item.nome}</NomePrato>
-                                   <p>{formatarPreco(item.preco)}</p>
-                              </div>
-                              <Lixeira onClick={() => removerPrato(item.id)} />
-                         </Prato>
-                    ))}
+               <S.Sidebar>
+                    <AnimatePresence>
+                         {items.map(item => (
+                              <motion.div
+                                   key={item.id}
+                                   initial={{ opacity: 0, scale: 0 }}
+                                   animate={{ opacity: 1, scale: 1 }}
+                                   exit={{ opacity: 0, scale: 0 }}
+                                   transition={{ duration: 0.3 }}
+                              >
+                                   <S.Dish>
+                                        <img src={item.foto} alt="Prato" />
+                                        <div>
+                                             <S.DishName>{item.nome}</S.DishName>
+                                             <p>{formatPrice(item.preco)}</p>
+                                        </div>
+                                        <S.Trash onClick={() => removerPrato(item.id)} />
+                                   </S.Dish>
+                              </motion.div>
+                         ))}
+                    </AnimatePresence>
 
-                    <Valor>
+                    <S.Cost>
                          <p>Valor total:</p>
-                         <span>{formatarPreco(totalCart)}</span>
-                    </Valor>
+                         <span>{formatPrice(getTotalPrice(items))}</span>
+                    </S.Cost>
 
-                    <Button>Continuar com a entrega</Button>
-               </Sidebar>
-          </Container>
+                    <S.Button onClick={payment}>Continuar com a entrega</S.Button>
+               </S.Sidebar>
+          </S.Container>
      );
 };
 
